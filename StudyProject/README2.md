@@ -6,6 +6,7 @@
  - [Angular Component4](#Angular-Component4)
  - [Angular Component 연결1](#Angular-Component-연결1)
  - [Angular Component 연결2](#Angular-Component-연결2)
+ - [Angular Component Life Cycle](#Angular-Component-Life-Cycle)
 
 
 
@@ -683,3 +684,74 @@ export class ChildComponent implements OnInit {
 > 템플릿 내에서 유효한 지시자처럼 사용할 수가 있다. <br>
 > input에 데이터를 입력하고 버튼을 클릭하면 `console.log`에 입력한 데이터가 출력이 된다. <br>
 >> `#myInput`를 사용 안 할 경우에는 프로퍼티(변수)를 만들고, 연결해주는 작업이 귀찮기 떄문이다. (간단하게 처리하기 위해서이다.) <br>
+ 
+ 
+## Angular Component Life Cycle
+[위로올라가기](강좌2)
+
+### 컴포넌트의 생명 주기
+
+> ***생성과 소멸의 관한 생명주기*** <br>
+> ***데이터가 변경되었을 떄 불리는 생명주기*** <br>
+
+### 생명 주기 순서
+1. ***constructor*** <br>
+2. ***ngOnChanges - DoCheck*** <br>
+3. ***ngOnInit*** <br>
+4. ngAfterContentInit <br>
+5. ngAfterContentChecked <br>
+6. ngAfterViewInit <br>
+7. ngAfterViewChecked <br>
+8. ***ngOnDestory*** <br>
+
+> ngOnDestory는 컴포넌트의 사용가 종료되었을 때 발생한다. <br>
+
+```js
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angular/core'; 
+// OnChanges를 선언해줘야한다. 
+
+@Component({
+  selector: 'app-child',
+  templateUrl: './child.component.html',
+  styleUrls: ['./child.component.scss']
+})
+export class ChildComponent implements OnInit, OnChanges { // OnChanges를 선언
+
+  constructor() { 
+    console.error('constructor');
+  }
+
+  ngOnChanges() { // ngOnChanges를 선언
+    console.error('ngOnChanges');  
+  }
+
+  ngOnInit(): void {
+    setInterval(() => {
+      this.next.emit();
+    }, 2500);
+  }
+}
+```
+> **여기서 가장 중요한 건 setInterval도 같이 넣어보았다. 그리고 생명주기를 살펴겠다.** <br>
+> **생명주기를 살펴보면 2.5초마다 ngOnChanges가 실행되는 것을 확인할 수가 있었다.** <br>
+> ngOnChanges는 최초로 불렸을 때, 변경되었을 때 일어난다. 
+
+1. ngAfterContentInit <br>
+2. ngAfterContentChecked <br>
+3. ngAfterViewInit <br>
+4. ngAfterViewChecked <br>
+> 4, 5, 6, 7 데이터가 새로 셋팅, 생성, 변경되었을 때 일어난다. <br>
+> 설정에 따라서 ngAfterViewChecked가 자주 나온다. 나중에 덜 나오기 위해서 체크해야한다. <br>
+>> 왜 덜 나오게 하느냐? 성능을 위해서이다. <br>
+
+### 정리
+- ***constructor*** - 누가 뭐래도 1빠 <br>
+- ***ngOnChanges*** - 최초 초기화 떄 / Input 프로퍼티가 변경될 때, setInerval, setTimeout <br>
+  - Input이 없으면 실행되지 않는다. <br>
+- ***ngOnInit*** - 프로퍼티 초기화된 직후<br>
+- ngAfterContentInit - gnContent 사용 시 자식이 초기화 된 직후 <br>
+- ngAfterContentChecked - ngContent를 통해 HTML을 받알 때<br>
+  - 최초 / 변경시
+- ngAfterViewInit - 템플릿이 모두 초기화되었을 떄 <br>
+- ngAfterViewChecked - 템플릿이 바인딩된 값이 변경되었을 때<br>
+- ***ngOnDestory*** <br>
