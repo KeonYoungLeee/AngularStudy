@@ -3,6 +3,7 @@
  - [Angular Component](#Angular-Component)
  - [Angular Component2](#Angular-Component2)
  - [Angular Component3](#Angular-Component3)
+ - [Angular Component4](#Angular-Component4)
 
 
 
@@ -308,4 +309,137 @@ export class Sample3Component implements OnInit {
 ```
 > ***`[]`의 사용할 경우에는 표현식의 결과물, 사용하지 않을 경우에는 문자열을 보낸다.*** <br>
 > `[]` 사용여부 잘 판단하기. <br>
+
+## Angular Component4
+[위로올라가기](강좌2)
+
+`<button [disabled]="">요런거>/button>` <br>
+#### AngularStudy\StudyProject\Front\src\app\sample3\sample3.component.html
+```html
+<button [disabled]="disabled">비 활성화</button>
+```
+
+#### AngularStudy\StudyProject\Front\src\app\sample3\sample3.component.ts
+```js
+import { Component, OnInit, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-sample3',
+  templateUrl: './sample3.component.html',
+  styleUrls: ['./sample3.component.scss']
+})
+export class Sample3Component implements OnInit {
+
+  disabled: boolean = true; // 바인딩을 시킬 것이다.
+
+  constructor() { }
+
+  ngOnInit(): void {
+    setTimeout(() => { 
+      this.disabled = false; // false가 되면 버튼이 활성화가 된다.
+    }, 1000);
+  }
+}
+```
+> 컴포넌트 내에 데이터와 템플릿 뷰를 적절히 일치시키는지 중요하다.
+
+### @Output, EventEmitter
+
+`<app-sample [click]="onClick()">>/app-sample>` <br>
+> 버튼에 클릭이 이벤트가 아니라 커스텀 엘리멘트에 클릭 이벤트가 발생하는 것을 아는 것이다. <br>
+> **부모가 이벤트를 감지하는 방식**을 알아볼 것이다. <br>
+
+#### AngularStudy\StudyProject\Front\src\app\sample3\sample3.component.ts (변경 전)
+```js
+import { Component, OnInit, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-sample3',
+  templateUrl: './sample3.component.html',
+  styleUrls: ['./sample3.component.scss']
+})
+export class Sample3Component implements OnInit {
+
+  disabled: boolean = true;
+
+  constructor() { }
+
+  ngOnInit(): void {
+    setTimeout(() => {
+      this.disabled = false;
+    }, 1000);
+  }
+}
+```
+
+#### AngularStudy\StudyProject\Front\src\app\app.component.html
+```html
+...생략
+<app-sample3 ()="custom()"></app-sample3>
+
+<router-outlet></router-outlet>
+```
+> `()` 안에 아직 변수명을 넣어주지 않았다.
+
+#### AngularStudy\StudyProject\Front\src\app\app.component.ts
+```js
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
+})
+export class AppComponent {
+  title = 'angular-quick-start';
+  fruits = ['apple', 'banana', 'graph'];
+
+  // custom 함수 생성
+  custom(): void {
+    console.log('custom event')
+  }
+}
+
+```
+
+#### AngularStudy\StudyProject\Front\src\app\sample3\sample3.component.ts
+```js
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core'; // Output, EventEmitter 추가를 한다.
+
+@Component({
+  selector: 'app-sample3',
+  templateUrl: './sample3.component.html',
+  styleUrls: ['./sample3.component.scss']
+})
+export class Sample3Component implements OnInit {
+
+  @Output() custom = new EventEmitter(); // @output추가
+  disabled: boolean = true;
+
+  constructor() { }
+
+  ngOnInit(): void {
+    setTimeout(() => {
+      this.disabled = false;
+      this.custom.emit(); // 이벤트가 발생한다. 
+      // 이벤트갑 발생하는 건 부모가 안다. 그것을 custon에 연결한다.
+    }, 1000);
+  }
+
+}
+
+```
+
+#### AngularStudy\StudyProject\Front\src\app\app.component.html
+```html 
+<div>Angular Study</div>
+<app-sample2></app-sample2>
+<app-sample3 propsTest="props Test hello props Test"></app-sample3>
+<app-sample3 *ngFor="let fruits of fruits" [furitsList]="fruits"></app-sample3>
+<app-sample3 (custom)="custom()"></app-sample3>
+
+<router-outlet></router-outlet>
+```
+> ***(custom)*** : @Output에 선언 된 custom(변수 명) - 자식에 선언되어 있다.<br>
+> ***custom()*** : 그 custom에 이벤트가 발생되면 부모의 호출되는 *함수 명* - 부모의 함수가 선언 되어있다.<br>
 

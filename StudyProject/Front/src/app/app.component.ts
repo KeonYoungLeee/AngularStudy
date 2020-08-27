@@ -8,4 +8,8 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'angular-quick-start';
   fruits = ['apple', 'banana', 'graph'];
+
+  custom(): void {
+    console.log('custom event')
+  }
 }
