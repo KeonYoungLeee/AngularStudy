@@ -1,4 +1,4 @@
 <p>grand works!</p>
-<app-parent>
-  
-</app-parent>
+<h2>{{ age }}</h2>
+<!-- 관계를 규정해야한다. -->
+<app-parent [age]="age" (up)="up()" ></app-parent>

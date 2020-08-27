@@ -20,4 +20,9 @@ export class ChildComponent implements OnInit {
     }, 2500);
   }
 
+  click(text :string, event: Event): void {
+    console.log(text);
+    console.log(event);
+  }
+
 }

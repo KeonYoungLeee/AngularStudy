@@ -5,6 +5,7 @@
  - [Angular Component3](#Angular-Component3)
  - [Angular Component4](#Angular-Component4)
  - [Angular Component 연결1](#Angular-Component-연결1)
+ - [Angular Component 연결2](#Angular-Component-연결2)
 
 
 
@@ -542,3 +543,143 @@ export class ChildComponent implements OnInit {
 >> 즉, 자식이 부모에게 이벤트를 전달(데이터 양방향의 특징이다.) <br>
 
 
+## Angular Component 연결2
+[위로올라가기](강좌2)
+
+자식이 할아버지에게 데이터를 전달 할 것이다. <br>
+
+#### StudyProject\Front\src\app\child\child.component.html
+```html
+<p>child works!</p>
+<h2>이름 : {{ name }}, 나이 : {{ age }} </h2>
+```
+
+#### StudyProject\Front\src\app\child\child.component.ts
+```js
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  templateUrl: './child.component.html',
+  styleUrls: ['./child.component.scss']
+})
+export class ChildComponent implements OnInit {
+
+  @Input() name: string;
+  @Input() age: number;
+
+  @Output() next = new EventEmitter(); // 부모에게 데이터를 전달하기 위해서 @Output 생성
+
+  constructor() { }
+
+  ngOnInit(): void {
+    setInterval(() => {
+      this.next.emit(); // 데이터를 전달 해줄 것이다. 
+    }, 2500);
+  }
+
+}
+```
+
+#### StudyProject\Front\src\app\parent\parent.component.html
+```html
+<p>parent works!</p>
+<h2>{{ age }}</h2>
+<app-child name="Jeery" [age]="age" (next)="next()" ></app-child>
+
+```
+> `(next)`가 부모에게 데이터를 전달 하는 것이다. `()` <- 전달 <br>
+>  `[age]`가 부모에게 데이터를 받는 것이다. <br>
+
+#### StudyProject\Front\src\app\parent\parent.component.ts
+```js
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-parent',
+  templateUrl: './parent.component.html',
+  styleUrls: ['./parent.component.scss']
+})
+export class ParentComponent implements OnInit {
+  @Input() age: number;
+
+  @Output() up = new EventEmitter(); // 부모에게 데이터를 전달하기 위해서 @Output 생성
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+  
+  next() {
+    // this.age = this.age + 1 
+    // 부모의 나이를 올리지 않을 것이다.
+    this.up.emit(); // 이벤트 발생
+  }
+}
+```
+
+#### StudyProject\Front\src\app\grand\grand.component.html
+```html
+<p>grand works!</p>
+<h2>{{ age }}</h2>
+<!-- 관계를 규정해야한다. -->
+<app-parent [age]="age" (up)="up()" ></app-parent>
+```
+> `(up)`가 부모에게 데이터를 전달 하는 것이다. 
+
+#### StudyProject\Front\src\app\grand\grand.component.ts
+```js
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-grand',
+  templateUrl: './grand.component.html',
+  styleUrls: ['./grand.component.scss']
+})
+export class GrandComponent implements OnInit {
+  age:number = 35;
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+  // 여기서 받아 줄 데이터를 정한다.
+  up(): void {
+    this.age = this.age + 1; 
+  }
+}
+```
+
+
+```html
+<input #myInput type="text">
+<button (click)="click(myInput.value, $event)">Click me!</button>
+```
+> `click(myInput)"`에 value를 안 넣어주고 console.log를 해보면 input type가 표시된다. <br>
+> input 데이터의 값을 볼려면 value도 넣어줘야한다. (자바스크립트 문법) <br> 
+
+```js
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  templateUrl: './child.component.html',
+  styleUrls: ['./child.component.scss']
+})
+export class ChildComponent implements OnInit {
+
+  ...생략
+
+  click(text, event): void {
+    console.log(text);
+    console.log(event);
+  }
+
+}
+
+```
+
+> 템플릿 내에서 유효한 지시자처럼 사용할 수가 있다. <br>
+> input에 데이터를 입력하고 버튼을 클릭하면 `console.log`에 입력한 데이터가 출력이 된다. <br>
+>> `#myInput`를 사용 안 할 경우에는 프로퍼티(변수)를 만들고, 연결해주는 작업이 귀찮기 떄문이다. (간단하게 처리하기 위해서이다.) <br>
