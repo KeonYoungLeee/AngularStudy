@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-child',
@@ -7,9 +7,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ChildComponent implements OnInit {
 
+  @Input() name: string;
+  @Input() age: number;
+
+  @Output() next = new EventEmitter();
+
   constructor() { }
 
   ngOnInit(): void {
+    setInterval(() => {
+      this.next.emit();
+    }, 2500);
   }
 
 }

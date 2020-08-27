@@ -4,6 +4,7 @@
  - [Angular Component2](#Angular-Component2)
  - [Angular Component3](#Angular-Component3)
  - [Angular Component4](#Angular-Component4)
+ - [Angular Component 연결1](#Angular-Component-연결1)
 
 
 
@@ -442,4 +443,102 @@ export class Sample3Component implements OnInit {
 ```
 > ***(custom)*** : @Output에 선언 된 custom(변수 명) - 자식에 선언되어 있다.<br>
 > ***custom()*** : 그 custom에 이벤트가 발생되면 부모의 호출되는 *함수 명* - 부모의 함수가 선언 되어있다.<br>
+
+## Angular Component 연결1
+[위로올라가기](강좌2)
+
+컴포넌트 grand, parent, child 생성해준다. <br>
+
+#### StudyProject\Front\src\app\parent\parent.component.html
+```html
+<p>parent works!</p>
+<app-child name="Jeery" [age]="age" ></app-child>
+```
+
+#### StudyProject\Front\src\app\parent\parent.component.ts
+```js
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-parent',
+  templateUrl: './parent.component.html',
+  styleUrls: ['./parent.component.scss']
+})
+export class ParentComponent implements OnInit {
+  age: number = 20;
+
+  constructor() { }
+  ngOnInit(): void {
+  }
+}
+```
+
+#### StudyProject\Front\src\app\child\child.component.ts
+```js
+import { Component, OnInit, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  templateUrl: './child.component.html',
+  styleUrls: ['./child.component.scss']
+})
+export class ChildComponent implements OnInit {
+
+  @Input() name: string;
+  @Input() age: number;
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+}
+
+```
+
+#### StudyProject\Front\src\app\child\child.component.html
+```js
+<p>child works!</p>
+<h2>이름 : {{ name }}, 나이 : {{ age }} </h2>
+```
+
+> 부모의 state가 자식에게 전달하는 방식 
+
+<br><br>
+
+#### StudyProject\Front\src\app\parent\parent.component.html
+```html
+<p>parent works!</p>
+<h2>{{ age }}</h2>
+<app-child name="Jeery" [age]="age" (next)="next" ></app-child>
+// next를 유심히 볼 것..
+```
+
+#### StudyProject\Front\src\app\child\child.component.ts
+```js
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  templateUrl: './child.component.html',
+  styleUrls: ['./child.component.scss']
+})
+export class ChildComponent implements OnInit {
+
+  @Input() name: string;
+  @Input() age: number;
+
+  @Output() next = new EventEmitter();
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+}
+```
+> 자식에서는 Output을 사용한다. <br>
+> 자식의 변수 next가 발생하면 **부모의 next의 함수**가 발생이 일어난다 <br>
+>> 즉, 자식이 부모에게 이벤트를 전달(데이터 양방향의 특징이다.) <br>
+
 

@@ -6,10 +6,14 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./parent.component.scss']
 })
 export class ParentComponent implements OnInit {
+  age: number = 20;
 
   constructor() { }
 
   ngOnInit(): void {
   }
-
+  
+  next() {
+    this.age = this.age + 1;
+  }
 }
