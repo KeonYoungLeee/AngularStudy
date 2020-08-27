@@ -2,6 +2,7 @@
 
  - [Angular Component](#Angular-Component)
  - [Angular Component2](#Angular-Component2)
+ - [Angular Component3](#Angular-Component3)
 
 
 
@@ -143,4 +144,168 @@ export class Sample2Component implements OnInit {
 }
 
 ```
+
+
+## Angular Component3
+[위로올라가기](강좌2)
+
+> 이것은 데이터(클래스)와 뷰(템블릿)의 이야기
+> 데이터가 바뀌면 뷰는 자동으로 바뀐다.
+> 데이터를 바꾸려면 사용자의 입력이 필요하다
+>> 항상 그런것은 아니다. (Electron)
+> 사용자가 입력함과 동시에 뷰를 바꾸려면 ***양방향 데이터 바인딩***을 사용한다.
+>> 대표적으로 `[()]`, `[(ngModel)]`
+
+### 양방향 데이터 바인딩 개념 잡기
+#### StudyProject\Front\src\app\sample2\sample2.component.html
+```html
+<p>sample2 works!</p>
+<p>name : {{ name }}</p>
+<button (click)="onClickMe($event)">Click me!</button>
+
+<!-- 양방형 데이터 바인딩 적용하기 -->
+<input type="text" [(ngModel)]="name" >
+<!-- 이 대로하면 에러가 나온다. ngModel이 양방형 데이터를 지원하는데 input은 Form태그이다 -->
+<!-- 그래서, FormModule을 사용해야한다. -->
+```
+
+#### StudyProject\Front\src\app\app.module.ts
+```js
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms'; // 추가
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { Sample2Component } from './sample2/sample2.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    Sample2Component
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule // 추가
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+> **양향형 바인딩이므로, ***데이터랑 뷰가 일치***하면서, 바뀔 때도 같이 바뀐다.**
+
+### Component 간 통신 (의존 관계:부모 자식관계)
+> 컴포넌트 트리 상에 붙어 있다면 ? => ***@input, @Ouput***
+> 붙어있지 않다면?
+>> 같은 가지에 있다면? (부모&자식관계가 아니라 자식&할아버지 관계)
+>> 같은 가지가 아니라면? => 중개자, 서비스
+
+### 템플릿과 데이터 바인딩(props 전달하는 방법)
+> `<app-sample test="문자열"></app-sample>`
+
+#### StudyProject\Front\src\app\app.component.html
+```html
+<div>Angular Study</div>
+<app-sample2></app-sample2>
+<app-sample3 propsTest="props Test hello props Test"></app-sample3>
+<!-- propsTest이름명 일치 -->
+
+<!-- 이거는 변수명을 전달하는 것이다. -->
+<app-sample3 [propsTest]="props Test hello props Test"></app-sample3>
+
+<router-outlet></router-outlet>
+```
+> `[]`의 의미는 나중에 알아본다.
+
+#### StudyProject\Front\src\app\sample3\sample3.component.html
+```html
+<p>sample3 works!</p>
+<div>sample3 propsTest => {{ propsTest }} </div>
+<!-- propsTest이름명 일치 -->
+```
+
+#### StudyProject\Front\src\app\sample3\sample3.component.ts
+```js
+import { Component, OnInit, Input } from '@angular/core'; // input을 추가해줘야한다.
+
+@Component({
+  selector: 'app-sample3',
+  templateUrl: './sample3.component.html',
+  styleUrls: ['./sample3.component.scss']
+})
+export class Sample3Component implements OnInit {
+
+  @Input() propsTest: string; // propsTest이름명 일치
+  
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+}
+```
+> Input을 추가해줘야한다. <br>
+> 전달을 하는 props이름과 변수 명이 일치해야한다. <br>
+
+### 배열 데이터를 변수에 담아서 props에 전달하기
+> `<app-sample [test]="변수명"></app-sample>`
+
+#### StudyProject\Front\src\app\app.component.html
+```html
+<div>Angular Study</div>
+<app-sample2></app-sample2>
+<app-sample3 propsTest="props Test hello props Test"></app-sample3>
+<app-sample3 *ngFor="let fruits of fruits" [furitsList]="fruits"></app-sample3> 
+<!-- [] <-잘 숙지해주기 -->
+<router-outlet></router-outlet>
+```
+
+#### StudyProject\Front\src\app\app.component.ts
+```js
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
+})
+export class AppComponent {
+  title = 'angular-quick-start';
+  fruits = ['apple', 'banana', 'graph']; // 배열 추가
+}
+
+```
+
+#### StudyProject\Front\src\app\sample3\sample3.component.html (props)
+```html
+<p>sample3 works!</p>
+<div>sample3 propsTest => {{ propsTest }} </div>
+<div>sample3 propsTest => {{ furitsList }} </div>
+```
+
+#### StudyProject\Front\src\app\sample3\sample3.component.ts (props)
+```js
+import { Component, OnInit, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-sample3',
+  templateUrl: './sample3.component.html',
+  styleUrls: ['./sample3.component.scss']
+})
+export class Sample3Component implements OnInit {
+
+  @Input() propsTest: string; 
+  @Input() furitsList: string;
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+}
+```
+> ***`[]`의 사용할 경우에는 표현식의 결과물, 사용하지 않을 경우에는 문자열을 보낸다.*** <br>
+> `[]` 사용여부 잘 판단하기. <br>
 
